@@ -1,4 +1,4 @@
-    name Publish to Pages
+    name: Publish to Pages
     on: push
     jobs:
       static-build:
