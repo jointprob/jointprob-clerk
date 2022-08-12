@@ -1,4 +1,5 @@
 {:deps    {io.github.nextjournal/clerk {:mvn/version "0.9.513"}}
+ :paths   ["src" "notebooks"]
  :aliases {:nextjournal/clerk
            {:extra-deps  {io.github.nextjournal/clerk {:git/sha "13ba371a894aa8696697d0a47cf715296c35e4b5"}}
             :extra-paths []
