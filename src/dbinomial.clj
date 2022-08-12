@@ -5,13 +5,13 @@
   [a b]
   (reduce *' (repeat b a)))
 
-(defn a!
+(defn factorial
   "factorial of a" [a]
   (apply *' (range 1 (inc a))))
 
 (defn dbinom [x size prob]
-  (* (/ (a! size)
-        (* (a! (- size x))
-           (a! x)))
+  (* (/ (factorial size)
+        (* (factorial (- size x))
+           (factorial x)))
      (exp prob x)
      (exp (- 1 prob) (- size x))))

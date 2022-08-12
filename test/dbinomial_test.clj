@@ -6,8 +6,8 @@
   (is (= (exp 2.0 4.0) 16.0)))
 
 
-(deftest a!-test
-  (are [a fac] (= fac (a! a))
+(deftest factorial-test
+  (are [a fac] (= fac (factorial a))
                0 1
                1 1
                2 2
