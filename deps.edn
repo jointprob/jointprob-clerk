@@ -2,5 +2,6 @@
  :paths   ["src" "notebooks"]
  :aliases {:nextjournal/clerk
            {:exec-fn     nextjournal.clerk/build-static-app!
+            :git/url "https://github.com/jamiepratt/jointprob-clerk"
             :exec-args   {:paths ["notebooks/**"]}}}}
 
