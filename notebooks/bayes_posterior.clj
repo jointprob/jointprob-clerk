@@ -1,6 +1,6 @@
 ;; # Bayes' Posterior! 🌍
 ^{:nextjournal.clerk/visibility #{:hide-ns :hide}}
-(ns ^:nextjournal.clerk/no-cache bayes-posterior
+(ns bayes-posterior
   (:require [nextjournal.clerk :as clerk]
             [controls :as c]
             [dbinomial :as d]))
@@ -15,34 +15,6 @@
 ^{::clerk/viewer c/slider}
 (defonce n (atom 0))
 
-^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(def samples (vec (take @n random_samples)))
-
-^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(def found_land (count (filter (partial = (hash-map :Water-or-Land "W")) samples)))
-
-^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(def binomial-distribution
-  (map
-    (fn [r] (let [p (/ r 500)]
-              (hash-map :x p :y (d/dbinom found_land @n p))))
-    (range 0 501)))
-
-^{::clerk/visibility :hide}
-(clerk/vl
-  {:hconcat
-   [
-    {:title    (str "N = " @n)
-     :data     {:values samples}
-     :mark     "bar",
-     :encoding {:x {:field "Water-or-Land", :type "nominal", :axis {:labelAngle 0}},
-                :y {:type "quantitative" :aggregate "count"}}}
-
-    {:title    (str "Probability Distribution (N = " @n ")")
-     :data     {:values binomial-distribution}
-     :mark     "line",
-     :encoding {:x {:field "x", :type "quantitative", :axis {:labelAngle 0}},
-                :y {:field "y" :type "quantitative"}}}]})
-
+(d/binomial-dis-for (take @n random_samples))
 
 
