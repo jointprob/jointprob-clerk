@@ -3,5 +3,5 @@
  :aliases {:nextjournal/clerk
            {:exec-fn nextjournal.clerk/build-static-app!
             :git/url "https://github.com/jamiepratt/jointprob-clerk"
-            :exec-args   {:paths ["notebooks/**"]}}}}
+            :exec-args   {:paths ["notebooks/**"] :bundle? false}}}}
 
