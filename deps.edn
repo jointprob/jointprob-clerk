@@ -1,7 +1,7 @@
 {:deps    {io.github.nextjournal/clerk {:mvn/version "0.9.513"}}
  :paths   ["src" "notebooks"]
  :aliases {:nextjournal/clerk
-           {:exec-fn     nextjournal.clerk/build-static-app!
+           {:exec-fn nextjournal.clerk/build-static-app!
             :git/url "https://github.com/jamiepratt/jointprob-clerk"
-            :exec-args   {:paths ["notebooks/bayes_posterior_static.clj"]}}}}
+            :exec-args   {:paths ["notebooks/**"]}}}}
 

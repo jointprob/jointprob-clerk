@@ -6,7 +6,7 @@
             [dbinomial :as d]))
 
 ^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(defonce random_samples (take 100 (repeatedly (fn [] (hash-map :Water-or-Land (if (>= 0.6 (rand)) "W" "L"))))))
+(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "L" "W")))))
 
 ;; We want to know how much of the globe is covered by water.
 
@@ -15,6 +15,7 @@
 ^{::clerk/viewer c/slider}
 (defonce n (atom 0))
 
+(take @n random_samples)
 (d/binomial-dis-for (take @n random_samples))
 
 
