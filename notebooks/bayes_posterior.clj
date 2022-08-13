@@ -16,6 +16,6 @@
 (defonce n (atom 0))
 
 (take @n random_samples)
-(d/binomial-dis-for (take @n random_samples))
+(d/graph-posterior-dis (take @n random_samples))
 
 
