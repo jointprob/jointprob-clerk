@@ -17,22 +17,24 @@
      (exp prob x)
      (exp (- 1 prob) (- size x))))
 
-(defn binomial-dis-for [samples]
+(defn posterior-dis [x size]
+  (let [p (map #(/ % 200) (range 0 201))
+        relative-likelihood (map #(dbinom x size %) p)
+        average-likelihood (/ (apply + relative-likelihood) 200)]
+    (zipmap p (map #(/ % average-likelihood) relative-likelihood))))
+
+(defn graph-posterior-dis [samples]
   (let [n (count samples)
         land (count (filter (partial = "L") samples))
         water (count (filter (partial = "W") samples))
-        binomial-distribution
-        (map
-          (fn [r] (let [p (/ r 200)]
-                    (hash-map :x p :y (dbinom water n p))))
-          (range 0 201))]
+        p-dis-values (map #(hash-map :p (first %) :likelihood (second %)) (posterior-dis water n))]
     (clerk/vl
       (let [p-dist-graph {:title    (str "Probability Distribution (n = " n ")")
-                          :data     {:values binomial-distribution}
+                          :data     {:values p-dis-values}
                           :mark     "line",
-                          :encoding {:x {:field "x", :type "quantitative", :axis {:labelAngle 0 :format "p"}
+                          :encoding {:x {:field "p", :type "quantitative", :axis {:labelAngle 0 :format "p"}
                                          :title "% of world that is water"},
-                                     :y {:field "y" :type "quantitative" :title "posterior probability"}}}]
+                                     :y {:field "likelihood" :type "quantitative" :title "posterior probability"}}}]
         {:hconcat
          [
           {:title    (str "n = " n)
