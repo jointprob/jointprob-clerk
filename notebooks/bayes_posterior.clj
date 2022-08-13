@@ -6,7 +6,7 @@
             [dbinomial :as d]))
 
 ^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "L" "W")))))
+(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
 
 ;; We want to know how much of the globe is covered by water.
 
