@@ -1,14 +1,15 @@
-name: Publish Clerk Notebooks to Github Pages
-on:
-  push:
-    branches:
-      - master
+name: Build and Deploy
+on: [push]
+permissions:
+  contents: write
 jobs:
-  static-build:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
     steps:
-      - name: 🛎 ️Checkout
-        uses: actions/checkout@v2
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
 
       - name: 🔧 Install java
         uses: actions/setup-java@v1
@@ -39,8 +40,7 @@ jobs:
       - name: 🏗 Clerk Build
         run: clojure -X:nextjournal/clerk :path-prefix '"jointprob-clerk/"' :git/sha '"${{ github.sha }}"'
 
-      - name: 🚀 Deploy
+      - name: Deploy to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.0
         with:
-          branch: gh-pages     # The branch the action should deploy to.
           folder: public/build # The folder the action should deploy.
