@@ -86,4 +86,45 @@
 
 ;----
 
+; ## Clojure Implementation
+
 ; $$Pr(W,L|p)=\frac{(W+L)!}{W!L!}p^{W}(1-p)^L$$
+
+;```clojure
+
+;(defn dbinom [x size prob]
+;  (* (/ (factorial size)
+;        (* (factorial (- size x))
+;           (factorial x)))
+;     (exp prob x)
+;     (exp (- 1 prob) (- size x))))
+
+;```
+
+
+;----
+;
+;$$
+;\text { Posterior }=\frac{\text { Probability of the data } \times \text { Prior }}{\text { Average probability of the data}}
+;$$
+;
+;$$
+;\operatorname{Pr}(p \mid W, L)=\frac{\operatorname{Pr}(W, L \mid p) \operatorname{Pr}(p)}{\operatorname{Pr}(W, L)}
+;$$
+;
+;$$
+;\operatorname{Pr}(W, L)=\int \operatorname{Pr}(W, L \mid p) \operatorname{Pr}(p) d p
+;$$
+
+;----
+
+;```clojure
+
+
+;(defn posterior-dis [x size]
+;  (let [p (map #(/ % 200) (range 0 201))
+;        relative-likelihood (map #(dbinom x size %) p)
+;        average-likelihood (/ (apply + relative-likelihood) 200)]
+;    (zipmap p (map #(/ % average-likelihood) relative-likelihood))))
+
+;```
