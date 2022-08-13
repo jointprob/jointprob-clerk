@@ -19,11 +19,11 @@
 
 (defn binomial-dis-for [samples]
   (let [n (count samples)
-        found_land (count (filter (partial = (hash-map :Water-or-Land "W")) samples))
+        found-land (count (filter (partial = "W") samples))
         binomial-distribution
         (map
           (fn [r] (let [p (/ r 200)]
-                    (hash-map :x p :y (dbinom found_land n p))))
+                    (hash-map :x p :y (dbinom found-land n p))))
           (range 0 201))]
     (clerk/vl
       (let [p-dist-graph {:title    (str "Probability Distribution (n = " n ")")
@@ -34,8 +34,10 @@
         {:hconcat
          [
           {:title    (str "n = " n)
-           :data     {:values samples}
+           :data     {:values
+                      [{:x "W" :y (if (zero? n) 0 (/ (- found-land n) n))}
+                       {:x "L" :y (if (zero? n) 0 (/ found-land n))}]}
            :mark     "bar",
-           :encoding {:x {:field "Water-or-Land", :type "nominal", :axis {:labelAngle 0}},
-                      :y {:type "quantitative" :aggregate "count"}}}
+           :encoding {:x {:field "x", :type "nominal", :axis {:labelAngle 0}},
+                      :y {:field "y", :type "quantitative"}}}
           p-dist-graph]}))))
