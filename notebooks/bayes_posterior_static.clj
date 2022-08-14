@@ -11,7 +11,7 @@
 
 
 ^{::clerk/viewer :hide-result}
-(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
+(def random_samples (take 10000 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
 
 ; We want to know how much of the globe is covered by land.
 
