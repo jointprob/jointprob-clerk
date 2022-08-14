@@ -1,8 +1,15 @@
-{:deps    {io.github.nextjournal/clerk {:mvn/version "0.9.513"}
+{:deps    {io.github.nextjournal/clerk           {:mvn/version "0.9.513"}
            io.github.nextjournal/clerk-slideshow {:git/sha "82b3b83ca456995250bdb99deceb5a24fdd75439"}}
  :paths   ["src" "notebooks"]
  :aliases {:nextjournal/clerk
-           {:exec-fn nextjournal.clerk/build-static-app!
-            :git/url "https://github.com/jamiepratt/jointprob-clerk"
-            :exec-args   {:paths ["notebooks/**"] :bundle? false}}}}
+           {:exec-fn   nextjournal.clerk/build-static-app!
+            :git/url   "https://github.com/jamiepratt/jointprob-clerk"
+            :exec-args {:paths ["notebooks/**"] :bundle? false}}
+           :repl-server
+           {:exec-fn   clojure.core.server/start-server
+            :exec-args {:name          "repl-server"
+                        :port          5555
+                        :accept        clojure.core.server/repl
+                        :server-daemon false}}}}
+
 
