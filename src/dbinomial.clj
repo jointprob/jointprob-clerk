@@ -52,13 +52,13 @@
          :mark     "bar",
          :encoding {:x {:field "x", :type "nominal", :axis {:labelAngle 0} :title "Land (L) or Water (W)?"},
                     :y {:field "y", :type "quantitative" :axis {:format "p"} :title "Percent of Sample"}}}
-        {:title    (str "Relative Likelihood (n = " n ")")
+        {:title    "Relative Likelihood"
          :data     {:values r-likelihood-graph}
          :mark     "line",
          :encoding {:x {:field "x", :type "quantitative", :axis {:labelAngle 0 :format "p"}
                         :title "% of world that is water"},
                     :y {:field "y" :type "quantitative" :title "probability"}}}
-        {:title    (str "Posterior Probability (standardized) (n = " n ")")
+        {:title    "Posterior Probability (standardized)"
          :data     {:values posterior-graph}
          :mark     "line",
          :encoding {:x {:field "x", :type "quantitative", :axis {:labelAngle 0 :format "p"}
