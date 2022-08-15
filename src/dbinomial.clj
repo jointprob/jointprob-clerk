@@ -26,11 +26,6 @@
   (let [average (/ (apply + r) (count r))]
     (map #(/ % average) r)))
 
-(defn posterior-dis [x size]
-  (let [p (map #(/ % 200) (range 0 201))
-        relative-likelihood (map #(dbinom x size %) p)
-        average-likelihood (/ (apply + relative-likelihood) 200)]
-    (zipmap p (map #(/ % average-likelihood) relative-likelihood))))
 
 (defn graph-posterior-dis [samples]
   (let [n (count samples)
