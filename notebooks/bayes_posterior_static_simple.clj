@@ -1,6 +1,6 @@
 ;; # Bayes' Posterior! 🌍
 ^{:nextjournal.clerk/visibility #{:hide-ns :hide}}
-(ns ^:nextjournal.clerk/no-cache bayes-posterior-static
+(ns ^:nextjournal.clerk/no-cache bayes-posterior-static-simple
   (:require [nextjournal.clerk :as clerk]
             [graphs :as g]
             [dbinomial :as d]
@@ -12,14 +12,25 @@
 ^{::clerk/viewer clerk/hide-result}
 (defn graph-posterior-dis [samples]
   (clerk/vl
-    {
-     :hconcat
-     [(apply g/land-or-water (d/count-land-or-water samples))
-      (g/probability-dis "Relative Likelihood" coll-p (d/r-likelihood-from-samples coll-p samples))
-      (g/probability-dis "Posterior Probability (standardized)" coll-p
-                         (->
-                           (d/r-likelihood-from-samples coll-p samples)
-                           d/standardize))]}))
+    {:vconcat
+     [{
+       :hconcat
+       [(apply g/land-or-water (d/count-land-or-water samples))
+        (g/probability-dis "Relative Likelihood" coll-p (d/r-likelihood-from-samples coll-p samples))
+        (g/probability-dis "Posterior Probability (standardized)" coll-p
+                           (->
+                             (d/r-likelihood-from-samples coll-p samples)
+                             d/standardize))]}
+      {
+       :hconcat
+       [(g/probability-dis "R-Likelihood - simple" coll-p
+                           (d/r-likelihood-from-samples-simple coll-p samples))
+        (g/probability-dis "R-Likelihood - simple (standardized)" coll-p
+                           (->
+                             (d/r-likelihood-from-samples-simple coll-p samples)
+                             d/standardize))]}]}))
+
+
 
 
 ^{::clerk/viewer clerk/hide-result}
@@ -27,7 +38,7 @@
 
 
 ^{::clerk/viewer :hide-result}
-(def random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
+(def random_samples (take 1000 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
 
 ; We want to know how much of the globe is covered by land.
 

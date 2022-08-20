@@ -3,6 +3,7 @@
 (ns bayes-posterior
   (:require [nextjournal.clerk :as clerk]
             [controls :as c]
+            [graphs :as g]
             [dbinomial :as d]))
 
 ^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
@@ -15,7 +16,17 @@
 ^{::clerk/viewer c/slider}
 (defonce n (atom 0))
 
-(take @n random_samples)
-(d/graph-posterior-dis (take @n random_samples))
+(def coll-p (map #(/ % 200) (range 0 201)))
 
+(def samples (take @n random_samples))
+
+(clerk/vl
+  {
+   :hconcat
+   [(apply g/land-or-water (d/count-land-or-water samples))
+    (g/probability-dis "Relative Likelihood" coll-p (d/r-likelihood-from-samples coll-p samples))
+    (g/probability-dis "Posterior Probability (standardized)" coll-p
+                       (->
+                         (d/r-likelihood-from-samples coll-p samples)
+                         d/standardize))]})
 
