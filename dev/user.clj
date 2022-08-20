@@ -18,12 +18,9 @@
   (clerk/clear-cache!)
 
   ;; or call `clerk/show!` explicitly
-  (clerk/show! "notebooks/introduction.clj")
-  (clerk/show! "notebooks/data_science.clj")
-  (clerk/show! "notebooks/sicmutils.clj")
-  (clerk/show! "notebooks/rule_30.clj")
-  (clerk/show! "notebooks/semantic.clj")
-  (clerk/show! "notebooks/images.clj")
+  (clerk/show! "notebooks/bayes_posterior.clj")
+  (clerk/show! "notebooks/bayes_posterior_static.clj")
+  (clerk/show! "notebooks/bayes_posterior_static_simple.clj")
 
   (clerk/show! "index.md")
 
