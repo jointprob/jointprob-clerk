@@ -9,10 +9,13 @@
   "factorial of a" [a]
   (apply *' (range 1 (inc a))))
 
+(defn n-of-permutations [x size]
+  (/ (factorial size)
+     (* (factorial (- size x))
+        (factorial x))))
+
 (defn dbinom [x size prob]
-  (* (/ (factorial size)
-        (* (factorial (- size x))
-           (factorial x)))
+  (* (n-of-permutations x size)
      (exp prob x)
      (exp (- 1 prob) (- size x))))
 
@@ -46,8 +49,8 @@
 
 (defn count-land-or-water [samples]
   (let [n (count samples)
-        land (count (filter (partial = "L") samples))
-        water (count (filter (partial = "W") samples))]
+        land (count (filter (partial = \L) samples))
+        water (count (filter (partial = \W) samples))]
     [n land water]))
 
 (defn r-likelihood-from-samples [coll-p samples]

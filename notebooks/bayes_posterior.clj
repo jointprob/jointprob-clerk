@@ -7,7 +7,7 @@
             [dbinomial :as d]))
 
 ^{::clerk/visibility #{:hide} :nextjournal.clerk/viewer :hide-result}
-(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) "W" "L")))))
+(defonce random_samples (take 100 (repeatedly (fn [] (if (>= 0.6 (rand)) \W \L)))))
 
 ;; We want to know how much of the globe is covered by water.
 
@@ -24,8 +24,8 @@
   {
    :hconcat
    [(apply g/land-or-water (d/count-land-or-water samples))
-    (g/probability-dis "Relative Likelihood" coll-p (d/r-likelihood-from-samples coll-p samples))
-    (g/probability-dis "Posterior Probability (standardized)" coll-p
+    (g/probability-dis "Relative Likelihood" "Pr(W,L|p)" coll-p (d/r-likelihood-from-samples coll-p samples))
+    (g/probability-dis "Posterior Probability (standardized)" "Pr(p|W,L)" coll-p
                        (->
                          (d/r-likelihood-from-samples coll-p samples)
                          d/standardize))]})

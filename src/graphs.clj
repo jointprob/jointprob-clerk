@@ -9,11 +9,11 @@
    :encoding {:x {:field "x", :type "nominal", :axis {:labelAngle 0} :title "Land (L) or Water (W)?"},
               :y {:field "y", :type "quantitative" :axis {:format "p"} :title "Percent of Sample"}}})
 
-(defn probability-dis [title p y-values]
+(defn probability-dis [title x-title p y-values]
   {:title    title
    :data     {:values (map #(hash-map :x %1 :y %2) p y-values)}
    :mark     "line",
    :encoding {:x {:field "x", :type "quantitative", :axis {:labelAngle 0 :format "p"}
                   :title "% of world that is water"},
-              :y {:field "y" :type "quantitative" :title "probability"}}})
+              :y {:field "y" :type "quantitative" :title x-title}}})
 
