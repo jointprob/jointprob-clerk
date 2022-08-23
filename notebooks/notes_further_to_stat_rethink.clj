@@ -1,6 +1,6 @@
 ;; # Bayes' Posterior! 🌍
 ^{:nextjournal.clerk/visibility #{:hide-ns :hide}}
-(ns ^:nextjournal.clerk/no-cache bayes-posterior-static-simple
+(ns ^:nextjournal.clerk/no-cache notes-further-to-stat-rethink
   (:require [nextjournal.clerk :as clerk]
             [graphs :as g]
             [dbinomial :as d]
