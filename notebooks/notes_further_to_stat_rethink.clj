@@ -1,4 +1,3 @@
-;; # Bayes' Posterior! 🌍
 ^{:nextjournal.clerk/visibility #{:hide-ns :hide}}
 (ns ^:nextjournal.clerk/no-cache notes-further-to-stat-rethink
   (:require [nextjournal.clerk :as clerk]
@@ -15,10 +14,10 @@
     {
      :hconcat
      [(apply g/land-or-water (d/count-land-or-water samples))
-      (g/probability-dis "Likelihood of This W/L Permutation" "Pr(W,L|p)" coll-p
+      (g/probability-dis "Likelihood of This W/L Sequence" "Pr(W,L|p)" coll-p
                          (d/r-likelihood-from-samples-simple coll-p samples))
 
-      (g/probability-dis "Likelihood of Any Permutation" "Pr(W,L|p)" coll-p (d/r-likelihood-from-samples coll-p samples))
+      (g/probability-dis "Likelihood of Any Sequence" "Pr(W,L|p)" coll-p (d/r-likelihood-from-samples coll-p samples))
       (g/probability-dis "Posterior Probability (standardized)" "Pr(p|W,L)" coll-p
                          (->
                            (d/r-likelihood-from-samples coll-p samples)
@@ -35,7 +34,7 @@
 ^{::clerk/viewer :hide-result}
 (def random_samples (take 1000 (repeatedly (fn [] (if (>= 0.6 (rand)) \W \L)))))
 
-;# Bayesian Updating
+;# Bayesian Updating 🌍
 ;### another look at the binomial distribution formula.
 ;
 ; Problem : We want to know how much of the globe is covered by land.

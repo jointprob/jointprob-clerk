@@ -20,7 +20,7 @@
   ;; or call `clerk/show!` explicitly
   (clerk/show! "notebooks/bayes_posterior.clj")
   (clerk/show! "notebooks/bayes_posterior_static.clj")
-  (clerk/show! "notebooks/bayes_posterior_static_simple.clj")
+  (clerk/show! "notebooks/notes_further_to_stat_rethink.clj")
 
   (clerk/show! "index.md")
 
