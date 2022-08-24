@@ -1,7 +1,7 @@
 These are just some experiments which helped me to get to grips both with using vegalite in Clerk notebooks (in clojure).
 I was playing with the equations for calculating a binomial distribution in order to get a better grip on "bayesian updating".
 
-Changes pushed to github will automatically be compiled by a github action and deployed to github pages if enabled for the repo.
+Changes pushed to github will automatically be compiled by a github action and deployed to github pages you may need to enable this for your repository if you fork this one.
 
 See built static pages [here.](https://jointprob.github.io/jointprob-clerk/)
 
