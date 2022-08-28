@@ -30,7 +30,7 @@
   (let [n (count prior)
         update-if-found (map #(/ % n) (range 0 (inc n)))    ; range from 0 to 1 inclusive with n elements
         update-if-not-found (map #(/ % n) (range n -1 -1))]
-    (map * prior (if found update-if-found update-if-not-found))))
+    (map *' prior (if found update-if-found update-if-not-found))))
 
 (defn relative-likelihood-simple [x size coll-p]
   (let [n (count coll-p)
