@@ -15,6 +15,7 @@
   ;; a subset of notebooks
   (clerk/serve! {:watch-paths ["notebooks" "src"] :show-filter-fn #(clojure.string/starts-with? % "notebooks")})
 
+  (clerk/halt-watcher!)
   (clerk/clear-cache!)
 
   ;; or call `clerk/show!` explicitly

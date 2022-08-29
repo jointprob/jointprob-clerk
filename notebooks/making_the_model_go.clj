@@ -130,8 +130,10 @@
   (let [trials (count data)
         water-count (count (filter #{:W} data))]
     (fn data-likelihood [p]
-      (let [binomial (make-model trials p)]
-        (r/pdf binomial water-count)))))
+      (if (<= 0.0 p 1.0)
+        (let [binomial (make-model trials p)]
+          (r/pdf binomial water-count))
+        0.0))))
 
 ;; Let's see how our likelihood look like for our data, but different (randomly selected) `p` values. 
 
@@ -308,3 +310,48 @@
 ;; ## MCMC
 
 ;; Markov chain Monte Carlo algorithm do not produce a `pdf` function for a posterior distribution. Instead it produces a samples from the posterior.
+
+;; The procedure is rougly as follows: `p` values are created from a random walk, jumping here and there (step is randomly selected from Normal distribution). Decision about jumping to the new `p` is based on the proportion between posterior at the new (proposed) `p` and the old value. And it is also made randomly.
+
+;; I propose slighly different implementation (without wrapping around the boundaries which is presented in the book).
+
+(defn mcmc-step
+  [posterior old-p]
+  (let [new-p (r/grand old-p 0.1)
+        q0 (posterior old-p)
+        q1 (posterior new-p)]
+    (if (and (not (zero? q1)) ;; do not jump when zero posterior
+             (< (r/drand) (/ q1 q0))) new-p old-p)))
+
+;; Here are samples after running above, the initial value is arbitrary (`0.5`)
+
+(iterate (partial mcmc-step posterior-200) 0.5)
+
+;; Now we can build a distribution out of the samples using kernel density estimation
+
+(defn mcmc-distribution
+  [posterior]
+  (let [samples (iterate (partial mcmc-step posterior) 0.5)]
+    (r/distribution :kde {:data (->> samples
+                                     (drop 500) ;; skip some first samples
+                                     (take-nth 3) ;; skip every third sample
+                                     (take 100000))
+                          :kde :gaussian})))
+
+(def kde-20 (mcmc-distribution posterior-20))
+(def kde-200 (mcmc-distribution posterior-200))
+(def kde-2000 (mcmc-distribution posterior-2000))
+
+^{::clerk/visibility :hide}
+(clerk/vl {:hconcat [(g/line-chart "Density of MCMC (data size=20)"
+                                   "Parameter p"
+                                   "Density"
+                                   grid-100 (map #(r/pdf kde-20 %) grid-100))
+                     (g/line-chart "Density of MCMC (data size=200)"
+                                   "Parameter p"
+                                   "Density"
+                                   grid-100 (map #(r/pdf kde-200 %) grid-100))
+                     (g/line-chart "Density of MCMC (data size=2000)"
+                                   "Parameter p"
+                                   "Density"
+                                   grid-100 (map #(r/pdf kde-2000 %) grid-100))]})
