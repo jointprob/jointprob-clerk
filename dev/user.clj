@@ -21,6 +21,7 @@
   (clerk/show! "notebooks/bayes_posterior.clj")
   (clerk/show! "notebooks/bayes_posterior_static.clj")
   (clerk/show! "notebooks/notes_further_to_stat_rethink.clj")
+  (clerk/show! "notebooks/making_the_model_go.clj")
 
   (clerk/show! "index.md")
 
