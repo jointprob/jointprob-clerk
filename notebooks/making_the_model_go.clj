@@ -187,27 +187,27 @@
 
 (def grid-100 (m/slice-range 0.0 1.0 100))
 
-;; Since our posterior is unnormalized we should find an evidence, let's make the simplest integration and normalize a posterior values on the grid points.
+;; Since our posterior is unnormalized we should find an evidence and normalize to posterior. Our posterior forms a discrete distribution which `pmf` is defined only in grid points.
 
 (defn grid-values-normalized
   [posterior]
   (let [values (map posterior grid-100)
-        integral (reduce + (map #(* 0.01 %) values))]
-    (map #(/ % integral) values)))
+        sum (reduce + values)]
+    (map #(/ % sum) values)))
 
 ^{::clerk/visibility :hide}
-(clerk/vl {:hconcat [(g/line-chart "Posterior for 20 samples"
-                                   "Parameter p"
-                                   "Posterior"
-                                   grid-100 (grid-values-normalized posterior-20))
-                     (g/line-chart "Posterior for 200 samples"
-                                   "Parameter p"
-                                   "Posterior"
-                                   grid-100 (grid-values-normalized posterior-200))
-                     (g/line-chart "Posterior for 2000 samples"
-                                   "Parameter p"
-                                   "Posterior"
-                                   grid-100 (grid-values-normalized posterior-2000))]})
+(clerk/vl {:hconcat [(g/point-chart "Posterior for 20 samples"
+                                    "Parameter p"
+                                    "Posterior"
+                                    grid-100 (grid-values-normalized posterior-20))
+                     (g/point-chart "Posterior for 200 samples"
+                                    "Parameter p"
+                                    "Posterior"
+                                    grid-100 (grid-values-normalized posterior-200))
+                     (g/point-chart "Posterior for 2000 samples"
+                                    "Parameter p"
+                                    "Posterior"
+                                    grid-100 (grid-values-normalized posterior-2000))]})
 
 ;; ----
 
