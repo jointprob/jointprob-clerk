@@ -139,18 +139,18 @@
 (defn data-likelihoods-n [n] (map (make-model-likelihood (take n data)) ps))
 
 ^{::clerk/visibility :hide}
-(clerk/vl {:hconcat [(g/line-chart "Model likelihood for 20 samples"
-                                   "parameter p"                                   
-                                   "likelihood"
-                                   ps (data-likelihoods-n 20))
-                     (g/line-chart "Model likelihood for 200 samples"
-                                   "parameter p"
-                                   "likelihood"
-                                   ps (data-likelihoods-n 200))
-                     (g/line-chart "Model likelihood for 2000 samples"
-                                   "parameter p"
-                                   "likelihood"
-                                   ps (data-likelihoods-n 2000))]})
+(clerk/vl {:hconcat [(g/point-chart "Model likelihood for 20 samples"
+                                    "parameter p"                                   
+                                    "likelihood"
+                                    ps (data-likelihoods-n 20))
+                     (g/point-chart "Model likelihood for 200 samples"
+                                    "parameter p"
+                                    "likelihood"
+                                    ps (data-likelihoods-n 200))
+                     (g/point-chart "Model likelihood for 2000 samples"
+                                    "parameter p"
+                                    "likelihood"
+                                    ps (data-likelihoods-n 2000))]})
 
 ;; ----
 
@@ -162,18 +162,57 @@
 
 ;; ----
 
-;; ## Posterior
+;; ## Unnormalized posterior
 
-;; The posterior is just a multiplication of likelihood and prior `pdf` values for given data and `p` divided by evidence. This should give us a distribution of `p`. The evidence is usually unknown, so I make unnormalized posterior.
+;; The posterior is just a multiplication of likelihood and prior `pdf` values for given data and `p` divided by evidence. This should give us a distribution of `p`. The evidence is usually unknown, so I make unnormalized posterior at the beginning.
 
 (defn make-unnormalized-posterior [likelihood prior]
   (fn [p] (* (likelihood p) (r/pdf prior p))))
 
 ;; Let's build 3 different posterior distributions for different number of gathered data.
 
-(def posterior-20 (make-unnormalized-posterior (make-model-likelihood (take 20 data)) prior-distribution))
-(def posterior-200 (make-unnormalized-posterior (make-model-likelihood (take 200 data)) prior-distribution))
-(def posterior-2000 (make-unnormalized-posterior (make-model-likelihood (take 2000 data)) prior-distribution))
+(def unnormalized-posterior-20
+  (make-unnormalized-posterior (make-model-likelihood (take 20 data)) prior-distribution))
+(def unnormalized-posterior-200
+  (make-unnormalized-posterior (make-model-likelihood (take 200 data)) prior-distribution))
+(def unnormalized-posterior-2000
+  (make-unnormalized-posterior (make-model-likelihood (take 2000 data)) prior-distribution))
+
+;; ----
+
+;; ## Evidence
+
+;; We can try to estimate the evidence by numerically calculate a integral. In our case (having only one parameter) it's quite simple.
+
+(defn evidence
+  [unnormalized-posterior]
+  (let [values (map unnormalized-posterior (range 0.0 1.0 0.001))]
+    (reduce + (map #(* 0.001 %) values))))
+
+^{::clerk/visibility :hide}
+(clerk/example
+ (evidence unnormalized-posterior-20)
+ (evidence unnormalized-posterior-200)
+ (evidence unnormalized-posterior-2000))
+
+;; I manually calculated the evidence for `[:W :W :W :L :L]` which is `1/6`. The following result is estimated quite well.
+
+(evidence (make-unnormalized-posterior (make-model-likelihood [:W :W :W :L :L]) prior-distribution))
+
+;; ----
+
+;; ## Posterior
+
+;; Now we are ready to create real posterior function with calculated evidence.
+
+(defn make-posterior
+  [unnormalized-posterior]
+  (let [pdata (evidence unnormalized-posterior)]
+    (fn [p] (/ (unnormalized-posterior p) pdata))))
+
+(def posterior-20 (make-posterior unnormalized-posterior-20))
+(def posterior-200 (make-posterior unnormalized-posterior-200))
+(def posterior-2000 (make-posterior unnormalized-posterior-2000))
 
 ;; ----
 
@@ -199,15 +238,22 @@
 (clerk/vl {:hconcat [(g/point-chart "Posterior for 20 samples"
                                     "Parameter p"
                                     "Posterior"
-                                    grid-100 (grid-values-normalized posterior-20))
+                                    grid-100 (grid-values-normalized unnormalized-posterior-20))
                      (g/point-chart "Posterior for 200 samples"
                                     "Parameter p"
                                     "Posterior"
-                                    grid-100 (grid-values-normalized posterior-200))
+                                    grid-100 (grid-values-normalized unnormalized-posterior-200))
                      (g/point-chart "Posterior for 2000 samples"
                                     "Parameter p"
                                     "Posterior"
-                                    grid-100 (grid-values-normalized posterior-2000))]})
+                                    grid-100 (grid-values-normalized unnormalized-posterior-2000))]})
+
+;; `fastmath` allows to build distribution from values and probabilities
+
+(def grid-distribution (r/distribution :enumerated-real {:data grid-100
+                                                       :probabilities (grid-values-normalized posterior-200)}))
+
+(r/pdf grid-distribution (nth grid-100 50))
 
 ;; ----
 
@@ -225,17 +271,18 @@
 
 (defn make-J [posterior] (fn [v] (- (m/log (posterior v)))))
 
-(defn mean [posterior] (ffirst (o/minimize :brent (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
-
+(defn mean [posterior]
+  (ffirst (o/minimize :brent (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
 
 ;; To calculate second derivative we can use finite difference method.
 
-(defn stddev [posterior mean] (m/sqrt (/ (let [J (make-J posterior)
-                                            fx+h (J (+ mean 0.001))
-                                            fx (J mean)
-                                            fx-h (J (- mean 0.001))]
-                                        (/ (- (+ fx+h fx-h) (* 2.0 fx))
-                                           (* 0.001 0.001))))))
+(defn stddev [posterior mean]
+  (m/sqrt (/ (let [J (make-J posterior)
+                   fx+h (J (+ mean 0.001))
+                   fx (J mean)
+                   fx-h (J (- mean 0.001))]
+               (/ (- (+ fx+h fx-h) (* 2.0 fx))
+                  (* 0.001 0.001))))))
 
 (defn make-normal-pdf [posterior]
   (let [mu (mean posterior)
