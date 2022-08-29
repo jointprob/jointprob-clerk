@@ -116,7 +116,7 @@
 ;; * Posterior - what is the distribution of parametrization of the model for given data
 ;; * Evidence - what is the plausibility of the data for given model averaged (integrated) by all possible parametrization.
 
-;; The last one, the Evidence, is just a constant value for given data. The bad thing is: it's hard to calculate (or impossible to calculate), the good thing is: you don't need this in most cases.
+;; The last one, the Evidence, is just a constant value for given data. The bad thing is: it's hard to calculate (or impossible to calculate), the good thing is: you don't need this in the most cases.
 
 ;; *Here is the fact number 3: The Bayesian inference is about finding the distribution of the model parameters.*
 
@@ -187,7 +187,7 @@
 
 (def grid-100 (m/slice-range 0.0 1.0 100))
 
-;; Since our posterior is unnormalized we should find an evidence, let's make a simplest integration and normalize a posterior.
+;; Since our posterior is unnormalized we should find an evidence, let's make the simplest integration and normalize a posterior values on the grid points.
 
 (defn grid-values-normalized
   [posterior]
