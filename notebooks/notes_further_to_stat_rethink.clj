@@ -9,23 +9,19 @@
 (def coll-p (map #(/ % 200) (range 0 201)))
 
 ^{::clerk/viewer clerk/hide-result}
-(defn graph-posterior-dis [samples]
+(defn graph-posterior-dis-continuous [samples]
   (clerk/vl
-    {
-     :hconcat
-     [(apply g/land-or-water (d/count-land-or-water samples))
-      (g/probability-dis "Likelihood of This W/L Sequence" "Pr(W,L|p)" coll-p
-                         (d/r-likelihood-from-samples-simple coll-p samples))
+            {
+             :hconcat
+             [(apply g/land-or-water (d/count-land-or-water samples))
+              (g/probability-dis "Likelihood of This W/L Sequence" "Pr(W,L|p)" coll-p
+                                 (d/r-likelihood-from-samples-simple coll-p samples))
 
-      (g/probability-dis "Likelihood of Any Sequence" "Pr(W,L|p)" coll-p (d/r-likelihood-from-samples coll-p samples))
-      (g/probability-dis "Posterior Probability (standardized)" "Pr(p|W,L)" coll-p
-                         (->
-                           (d/r-likelihood-from-samples coll-p samples)
-                           d/standardize))]}))
-
-
-
-
+              (g/probability-dis "Likelihood of Any Sequence" "Pr(W,L|p)" coll-p (d/r-likelihood-from-samples coll-p samples))
+              (g/probability-dis "Posterior Probability (standardized)" "Pr(p|W,L)" coll-p
+                                 (->
+                                   (d/r-likelihood-from-samples coll-p samples)
+                                   d/standardize))]}))
 
 ^{::clerk/viewer clerk/hide-result}
 (clerk/add-viewers! [slideshow/viewer])
@@ -218,45 +214,45 @@
 
 (take 2 random_samples)
 
-(graph-posterior-dis (take 2 random_samples))
+(graph-posterior-dis-continuous (take 2 random_samples))
 
 ;----
 ;
 ; And another:
 (take 3 random_samples)
-(graph-posterior-dis (take 3 random_samples))
+(graph-posterior-dis-continuous (take 3 random_samples))
 
 ;----
 
 ; etc.....
 (take 4 random_samples)
-(graph-posterior-dis (take 4 random_samples))
+(graph-posterior-dis-continuous (take 4 random_samples))
 
 ;----
 (take 5 random_samples)
-(graph-posterior-dis (take 5 random_samples))
+(graph-posterior-dis-continuous (take 5 random_samples))
 
 ;----
 (take 10 random_samples)
-(graph-posterior-dis (take 10 random_samples))
+(graph-posterior-dis-continuous (take 10 random_samples))
 
 ;----
 (take 15 random_samples)
-(graph-posterior-dis (take 15 random_samples))
+(graph-posterior-dis-continuous (take 15 random_samples))
 
 ;----
 (take 20 random_samples)
-(graph-posterior-dis (take 20 random_samples))
+(graph-posterior-dis-continuous (take 20 random_samples))
 
 ;----
 (take 40 random_samples)
-(graph-posterior-dis (take 40 random_samples))
+(graph-posterior-dis-continuous (take 40 random_samples))
 
 ;----
 (take 50 random_samples)
-(graph-posterior-dis (take 50 random_samples))
+(graph-posterior-dis-continuous (take 50 random_samples))
 
 ;----
 (take 100 random_samples)
-(graph-posterior-dis (take 100 random_samples))
+(graph-posterior-dis-continuous (take 100 random_samples))
 
