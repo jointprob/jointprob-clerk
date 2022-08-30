@@ -108,10 +108,13 @@
 
 ;```clojure
 
+;(defn n-of-permutations [x size]
+;  (/ (factorial size)
+;     (* (factorial (- size x))
+;        (factorial x))))
+;
 ;(defn dbinom [x size prob]
-;  (* (/ (factorial size)
-;        (* (factorial (- size x))
-;           (factorial x)))
+;  (* (n-of-permutations x size)
 ;     (exp prob x)
 ;     (exp (- 1 prob) (- size x))))
 
@@ -136,11 +139,10 @@
 
 ;```clojure
 
-
-;(defn posterior-dis [x size]
-;  (let [p (map #(/ % 200) (range 0 201))
-;        relative-likelihood (map #(dbinom x size %) p)
-;        average-likelihood (/ (apply + relative-likelihood) 200)]
-;    (zipmap p (map #(/ % average-likelihood) relative-likelihood))))
+;(defn standardize
+;  "make average of values in coll r = 1"
+;  [r]
+;  (let [average (/ (apply + r) (count r))]
+;    (map #(/ % average) r)))
 
 ;```
