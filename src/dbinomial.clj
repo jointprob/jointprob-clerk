@@ -9,37 +9,33 @@
   "factorial of a" [a]
   (apply *' (range 1 (inc a))))
 
-(defn n-of-permutations [x size]
-  (/ (factorial size)
-     (* (factorial (- size x))
+(defn n-of-permutations [x n]
+  (/ (factorial n)
+     (* (factorial (- n x))
         (factorial x))))
 
-(defn dbinom [x size prob]
-  (* (n-of-permutations x size)
+(defn dbinom [x n prob]
+  (* (n-of-permutations x n)
      (exp prob x)
-     (exp (- 1 prob) (- size x))))
+     (exp (- 1 prob) (- n x))))
 
-(defn relative-likelihood [x size coll-p]
+(defn relative-likelihood [x n coll-p]
   "Calculate the relative likelihood for a collection of p."
-  (map #(dbinom x size %) coll-p))
+  (map #(dbinom x n %) coll-p))
 
-(defn bayesian-binary-update
-  "Given prior probability in collection prior, which is a collection of evenly spaced probability samples over a
-  range 0 to 1 inclusive and a binary variable found update to a new relative-likelihood distribution."
-  [found prior]
-  (let [n (count prior)
-        update-if-found (map #(/ % n) (range 0 (inc n)))    ; range from 0 to 1 inclusive with n elements
-        update-if-not-found (map #(/ % n) (range n -1 -1))]
+(defn bayesian-binary-update[found prior coll-p]
+  (let [update-if-found coll-p    ; range from 0 to 1 inclusive with size elements
+        update-if-not-found (map #(- 1 %) coll-p)]
     (map *' prior (if found update-if-found update-if-not-found))))
 
-(defn relative-likelihood-simple [x size coll-p]
-  (let [n (count coll-p)
-        uniform-prior (repeat n 1)
+(defn relative-likelihood-simple [x n coll-p]
+  "size is no of samples of distributions - assumes evenly spaced samples from 0 to 1 inclusive."
+  (let [uniform-prior (repeat (count coll-p) 1)
         times-found x
-        times-not-found (- size x)]
-    (->                                                     ; repeatedly update depending on times-found and times-not-found :
-      (reduce (fn [last-step _] (bayesian-binary-update true last-step)) uniform-prior (repeat times-found 1))
-      (#(reduce (fn [last-step _] (bayesian-binary-update false last-step)) % (repeat times-not-found 1))))))
+        times-not-found (- n x)]
+    (-> ; repeatedly update depending on times-found and times-not-found :
+      (reduce (fn [last-step _] (bayesian-binary-update true last-step coll-p)) uniform-prior (repeat times-found 1))
+      (#(reduce (fn [last-step _] (bayesian-binary-update false last-step coll-p)) % (repeat times-not-found 1))))))
 
 (defn standardize
   "make average of values in coll r = 1"

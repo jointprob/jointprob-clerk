@@ -21,9 +21,15 @@
 
 
 (deftest relative-likelihood-simple-test
-  (let [p (map #(/ % 200) (range 0 201))]
-    (are [x size] (= (relative-likelihood x size p) (relative-likelihood-simple x size p))
-                  3 9
-                  6 9
-                  2 15)))
+  (let [coll-p (map #(/ % 200) (range 0 201))]
+    (are [x n] (= (relative-likelihood x n coll-p)
+                  (map (partial * (n-of-permutations x n)) (relative-likelihood-simple x n coll-p)))
+               0 1
+               1 1
+               2 2
+               1 2
+               3 9
+               6 9
+               2 15)))
+
 
