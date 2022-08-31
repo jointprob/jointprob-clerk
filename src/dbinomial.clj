@@ -9,10 +9,15 @@
   "factorial of a" [a]
   (apply *' (range 1 (inc a))))
 
+#_(defn n-of-permutations [x n]
+    (/ (factorial n)
+       (* (factorial (- n x))
+          (factorial x))))
+
+;; shouldn't produce overflow
 (defn n-of-permutations [x n]
-  (/ (factorial n)
-     (* (factorial (- n x))
-        (factorial x))))
+  (/ (reduce *' (range n x -1))
+     (factorial (- n x))))
 
 (defn dbinom [x n prob]
   (* (n-of-permutations x n)
