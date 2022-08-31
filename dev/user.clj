@@ -34,4 +34,7 @@
   ;; produce a static app
   (clerk/build-static-app! {:paths (into ["index.md"]
                                          (mapv #(str "notebooks/" % ".clj")
-                                               '[introduction data_science rule_30 semantic]))}))
+                                               '[introduction data_science rule_30 semantic]))})
+
+  (clerk/build-static-app! {:paths ["notebooks/**"] :bundle? false}))
+

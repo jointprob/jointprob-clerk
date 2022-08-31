@@ -32,8 +32,6 @@
          '[fastmath.core :as m]
          '[fastmath.kernel :as k])
 
-(m/use-primitive-operators)
-
 ;; A `fastmath.random` namespace contains a set of functions connected to the randomness. In this notebook I use the following:
 
 ;; * `r/randval` - to select randomly one of two provided values with given probability. I use it to generate our data.
