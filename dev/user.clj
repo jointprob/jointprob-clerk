@@ -14,9 +14,10 @@
   ;; start with file watcher and a `show-filter-fn` function to watch
   ;; a subset of notebooks
   (clerk/serve! {:watch-paths ["notebooks" "src"] :show-filter-fn #(clojure.string/starts-with? % "notebooks")})
-
+  (clerk/serve! {:browse? false})
   (clerk/halt-watcher!)
   (clerk/clear-cache!)
+  (clerk/halt!)
 
   ;; or call `clerk/show!` explicitly
   (clerk/show! "notebooks/bayes_posterior.clj")

@@ -3,7 +3,8 @@
   (:require [nextjournal.clerk :as clerk]
             [graphs :as g]
             [nextjournal.clerk-slideshow :as slideshow]
-            [fastmath.random :as r]))
+            [fastmath.random :as r]
+            [fastmath.protocols]))
 
 ^{::clerk/viewer :hide-result
   ::clerk/visibility :hide}
@@ -28,7 +29,10 @@
 ;; I use [fastmath](https://github.com/generateme/fastmath) library for my implementation. 
 
 (require '[fastmath.random :as r]
-         '[fastmath.core :as m])
+         '[fastmath.core :as m]
+         '[fastmath.kernel :as k])
+
+(m/use-primitive-operators)
 
 ;; A `fastmath.random` namespace contains a set of functions connected to the randomness. In this notebook I use the following:
 
@@ -36,7 +40,9 @@
 ;; * `r/distibution` - to create a distibution
 ;; * `r/pdf` - to calculate likelihood
 ;; * `r/drand` - to get random floating point (double) number
+;; * `r/grand` - to get random number from normal distribution
 ;; * `m/slice-range` - to get evenly distributed points from given range.
+;; * `k/kernel-density` - to construct pdf from samples
 
 ;; ----
 
@@ -44,7 +50,7 @@
 
 ;; First we need our data. To simulate the experiment described in the book I build the sequence of `:W` (water) and `:L` (land) keywords with given probability of selecting a water (`water-probability`).
 
-(def water-probability (r/drand 0.45 0.75))
+(def water-probability (r/drand 0.55 0.65))
 
 (def data (repeatedly #(r/randval water-probability :W :L)))
 
@@ -129,7 +135,7 @@
 (defn make-model-likelihood [data]
   (let [trials (count data)
         water-count (count (filter #{:W} data))]
-    (fn data-likelihood [p]
+    (fn data-likelihood ^double [^double p]
       (if (<= 0.0 p 1.0)
         (let [binomial (make-model trials p)]
           (r/pdf binomial water-count))
@@ -169,7 +175,7 @@
 ;; The posterior is just a multiplication of likelihood and prior `pdf` values for given data and `p` divided by evidence. This should give us a distribution of `p`. The evidence is usually unknown, so I make unnormalized posterior at the beginning.
 
 (defn make-unnormalized-posterior [likelihood prior]
-  (fn [p] (* (likelihood p) (r/pdf prior p))))
+  (fn [p] (* ^double (likelihood p) (r/pdf prior p))))
 
 ;; Let's build 3 different posterior distributions for different number of gathered data.
 
@@ -187,9 +193,9 @@
 ;; We can try to estimate the evidence by numerically calculate a integral. In our case (having only one parameter) it's quite simple.
 
 (defn evidence
-  [unnormalized-posterior]
+  ^double [unnormalized-posterior]
   (let [values (map unnormalized-posterior (range 0.0 1.0 0.001))]
-    (reduce + (map #(* 0.001 %) values))))
+    (reduce m/fast+ (map (fn [^double v] (* 0.001 v)) values))))
 
 ^{::clerk/visibility :hide}
 (clerk/example
@@ -210,7 +216,7 @@
 (defn make-posterior
   [unnormalized-posterior]
   (let [pdata (evidence unnormalized-posterior)]
-    (fn [p] (/ (unnormalized-posterior p) pdata))))
+    (fn ^double [^double p] (/ ^double (unnormalized-posterior p) pdata))))
 
 (def posterior-20 (make-posterior unnormalized-posterior-20))
 (def posterior-200 (make-posterior unnormalized-posterior-200))
@@ -233,8 +239,8 @@
 (defn grid-values-normalized
   [posterior]
   (let [values (map posterior grid-100)
-        sum (reduce + values)]
-    (map #(/ % sum) values)))
+        sum (double (reduce m/fast+ values))]
+    (map (fn [^double v] (/ v sum)) values)))
 
 ^{::clerk/visibility :hide}
 (clerk/vl {:hconcat [(g/point-chart "Posterior for 20 samples"
@@ -271,18 +277,18 @@
 
 (require '[fastmath.optimization :as o])
 
-(defn make-J [posterior] (fn [v] (- (m/log (posterior v)))))
+(defn make-J [posterior] (fn ^double [^double v] (- (m/log (posterior v)))))
 
-(defn mean [posterior]
-  (ffirst (o/minimize :brent (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
+(defn mean ^double [posterior]
+  (ffirst (o/minimize :bfgs (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
 
 ;; To calculate second derivative we can use finite difference method.
 
-(defn stddev [posterior mean]
+(defn stddev ^double [posterior ^double mean]
   (m/sqrt (/ (let [J (make-J posterior)
-                   fx+h (J (+ mean 0.001))
-                   fx (J mean)
-                   fx-h (J (- mean 0.001))]
+                   ^double fx+h (J (+ mean 0.001))
+                   ^double fx (J mean)
+                   ^double fx-h (J (- mean 0.001))]
                (/ (- (+ fx+h fx-h) (* 2.0 fx))
                   (* 0.001 0.001))))))
 
@@ -316,10 +322,10 @@
 ;; I propose slighly different implementation (without wrapping around the boundaries which is presented in the book).
 
 (defn mcmc-step
-  [posterior old-p]
+  [posterior ^double old-p]
   (let [new-p (r/grand old-p 0.1)
-        q0 (posterior old-p)
-        q1 (posterior new-p)]
+        ^double q0 (posterior old-p)
+        ^double q1 (posterior new-p)]
     (if (and (not (zero? q1)) ;; do not jump when zero posterior
              (< (r/drand) (/ q1 q0))) new-p old-p)))
 
@@ -327,31 +333,65 @@
 
 (iterate (partial mcmc-step posterior-200) 0.5)
 
-;; Now we can build a distribution out of the samples using kernel density estimation
+;; Now we can build a density function out of the samples using kernel density estimation
 
-(defn mcmc-distribution
+(defn mcmc-density
   [posterior]
   (let [samples (iterate (partial mcmc-step posterior) 0.5)]
-    (r/distribution :kde {:data (->> samples
+    (k/kernel-density :gaussian (->> samples
                                      (drop 500) ;; skip some first samples
-                                     (take-nth 3) ;; skip every third sample
-                                     (take 100000))
-                          :kde :gaussian})))
+                                     (take-nth 3) ;; skip some samples
+                                     (take 100000)))))
 
-(def kde-20 (mcmc-distribution posterior-20))
-(def kde-200 (mcmc-distribution posterior-200))
-(def kde-2000 (mcmc-distribution posterior-2000))
+(def kde-20 (mcmc-density posterior-20))
+(def kde-200 (mcmc-density posterior-200))
+(def kde-2000 (mcmc-density posterior-2000))
+
+(kde-20 0.5)
 
 ^{::clerk/visibility :hide}
 (clerk/vl {:hconcat [(g/line-chart "Density of MCMC (data size=20)"
                                    "Parameter p"
                                    "Density"
-                                   grid-100 (map #(r/pdf kde-20 %) grid-100))
+                                   grid-100 (map kde-20 grid-100))
                      (g/line-chart "Density of MCMC (data size=200)"
                                    "Parameter p"
                                    "Density"
-                                   grid-100 (map #(r/pdf kde-200 %) grid-100))
+                                   grid-100 (map kde-200 grid-100))
                      (g/line-chart "Density of MCMC (data size=2000)"
                                    "Parameter p"
                                    "Density"
-                                   grid-100 (map #(r/pdf kde-2000 %) grid-100))]})
+                                   grid-100 (map kde-2000 grid-100))]})
+
+;; ----
+
+;; # Practice
+
+;; Solutions for selected excercises
+
+;; ----
+
+;; ## 2M1
+
+^{::clerk/viewer :hide-result}
+(def data-2m1 [[:W :W :W] [:W :W :W :L] [:L :W :W :L :W :W :W]])
+
+(defn grid-posterior
+  ([data] (grid-posterior data prior-distribution))
+  ([data prior] (-> data make-model-likelihood (make-unnormalized-posterior prior) grid-values-normalized)))
+
+(clerk/vl {:hconcat [(g/point-chart (str "Data: " (data-2m1 0)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 0)))
+                     (g/point-chart (str "Data: " (data-2m1 1)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 1)))
+                     (g/point-chart (str "Data: " (data-2m1 2)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 2)))]})
+
+;; ----
+
+;; ## 2M2
+
+(def custom-prior
+  (reify fastmath.protocols/DistributionProto
+    (pdf [_ v] (if (< ^double v 0.5) 0.0 2.0))))
+
+(clerk/vl {:hconcat [(g/point-chart (str "Data: " (data-2m1 0)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 0) custom-prior))
+                     (g/point-chart (str "Data: " (data-2m1 1)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 1) custom-prior))
+                     (g/point-chart (str "Data: " (data-2m1 2)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 2) custom-prior))]})

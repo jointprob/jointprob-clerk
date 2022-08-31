@@ -20,7 +20,7 @@
 (defn line-chart [title x-title y-title x-values y-values]
   {:title title
    :data {:values (map #(hash-map :x %1 :y %2) x-values y-values)}
-   :mark {:type "line" :point {:filled false :fill "white"}}
+   :mark :line
    :encoding {:x {:field "x" :type "quantitative" :title x-title}
               :y {:field "y" :type "quantitative" :title y-title}}})
 
