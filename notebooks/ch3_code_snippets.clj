@@ -164,8 +164,9 @@
 (def dummy-w (r/->seq dummy-distr 10000))
 
 ;; a table
-(-> (frequencies dummy-w)
-    (update-vals #(/ % 10000.0)))
+(->> (frequencies dummy-w)
+     (map (fn [[k v]] [k (/ v 10000.0)]))
+     (sort-by first))
 
 ;; ----
 
