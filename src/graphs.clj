@@ -44,3 +44,12 @@
    :layer [{:mark :area
             :transform [{:filter (merge transform {:field "x"})}]}
            {:mark :line}]})
+
+(defn frequencies-chart
+  [title x-title y-title x-values]
+  (let [f (frequencies x-values)]
+    {:title title
+     :data {:values (map (fn [[k v]] {:x k :y v}) f)}
+     :mark :bar
+     :encoding {:x {:field "x" :type "quantitative" :title x-title}
+                :y {:field "y" :type "quantitative" :title y-title}}}))
