@@ -236,6 +236,7 @@
 
 ;; Since our posterior is unnormalized we should find an evidence and normalize to posterior. Our posterior forms a discrete distribution which `pmf` is defined only in grid points.
 
+
 (defn grid-values-normalized
   [posterior]
   (let [values (map posterior grid-100)
@@ -280,7 +281,7 @@
 (defn make-J [posterior] (fn ^double [^double v] (- (m/log (posterior v)))))
 
 (defn mean ^double [posterior]
-  (ffirst (o/minimize :bfgs (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
+  (ffirst (o/minimize :gradient (make-J posterior) {:bounds [[0.0 1.0]] :initial [0.5]})))
 
 ;; To calculate second derivative we can use finite difference method.
 
@@ -331,7 +332,7 @@
 
 ;; Here are samples after running above, the initial value is arbitrary (`0.5`)
 
-(iterate (partial mcmc-step posterior-200) 0.5)
+(take 10 (iterate (partial mcmc-step posterior-200) 0.5))
 
 ;; Now we can build a density function out of the samples using kernel density estimation
 
@@ -395,3 +396,4 @@
 (clerk/vl {:hconcat [(g/point-chart (str "Data: " (data-2m1 0)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 0) custom-prior))
                      (g/point-chart (str "Data: " (data-2m1 1)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 1) custom-prior))
                      (g/point-chart (str "Data: " (data-2m1 2)) "Parameter p" "Probability" grid-100 (grid-posterior (data-2m1 2) custom-prior))]})
+
