@@ -24,6 +24,7 @@
   (clerk/show! "notebooks/bayes_posterior_static.clj")
   (clerk/show! "notebooks/notes_further_to_stat_rethink.clj")
   (clerk/show! "notebooks/making_the_model_go.clj")
+  (clerk/show! "notebooks/ch3_code_snippets.clj")
 
   (clerk/show! "index.md")
 
@@ -37,4 +38,3 @@
                                                '[introduction data_science rule_30 semantic]))})
 
   (clerk/build-static-app! {:paths ["notebooks/**"] :bundle? false}))
-
