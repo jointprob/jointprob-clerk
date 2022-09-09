@@ -1,9 +1,11 @@
 (require '[nextjournal.clerk :as clerk])
 
 ;; start Clerk's built-in webserver on the default port 7777, opening the browser when done
-
+(clerk/serve! {:watch-paths ["notebooks" "src"]})
 
 (comment
+  ;; to require tests:
+  (require '[dbinomial-test])
   (clerk/serve! {:watch-paths ["notebooks" "src"]})
   ;; start without file watcher, open browser when started
   (clerk/serve! {:browse? true})

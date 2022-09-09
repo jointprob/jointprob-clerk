@@ -3,6 +3,7 @@
            generateme/fastmath {:mvn/version "2.1.9-SNAPSHOT"
                                 :exclusions [com.github.haifengl/smile-mkl]}}
  :paths   ["src" "notebooks"]
+
  :aliases {:nextjournal/clerk
            {:exec-fn   nextjournal.clerk/build-static-app!
             :git/url   "https://github.com/jamiepratt/jointprob-clerk"
@@ -12,6 +13,6 @@
             :exec-args {:name          "repl-server"
                         :port          5555
                         :accept        clojure.core.server/repl
-                        :server-daemon false}}}}
-
-
+                        :server-daemon false}}
+           :dev {:extra-paths ["dev"]}
+           :test {:extra-paths ["test"]}}}
