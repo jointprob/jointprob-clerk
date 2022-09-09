@@ -5,18 +5,17 @@
   [a b]
   (reduce *' (repeat b a)))
 
+(defn factorial-div-factorial
+  "factorial of a divided by factorial of b, assuming b < a" [a b]
+  (reduce *' (range (inc b) (inc a))))
+
 (defn factorial
   "factorial of a" [a]
-  (apply *' (range 1 (inc a))))
-
-#_(defn n-of-permutations [x n]
-    (/ (factorial n)
-       (* (factorial (- n x))
-          (factorial x))))
+  (reduce *' (range 1 (inc a))))
 
 ;; shouldn't produce overflow
 (defn n-of-permutations [x n]
-  (/ (reduce *' (range n x -1))
+  (/ (factorial-div-factorial n x)
      (factorial (- n x))))
 
 (defn dbinom [x n prob]
