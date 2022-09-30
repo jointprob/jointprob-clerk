@@ -132,29 +132,47 @@
   (map (fn [n] (list n (repeatedly 1000 #(expected-error-from-random-samples-vs-real-loss n 0.6)))) 
        [10 100 1000]))
 
-(clerk/vl {:hconcat (map
-            (fn [[n e-vs-a]]
-              (g/point-chart (str "Expected vs Actual Error (n=" n ")")
-                             "Expected"
-                             "Actual"
-                             (map :expected e-vs-a)
-                             (map :actual e-vs-a)))
-            expected-vs-actuals)})
+;; ## Finally let's plot the expected and actual error and the (expected - actual error for each trial)
+
+;; The blue lines on these graphs are the means for 1,000 trials.
 
 (clerk/vl {:hconcat (map
                      (fn [[n e-vs-a]]
                        (hash-map :vconcat
-                        [(g/point-chart (str "Actual Error (n=" n ")")
-                                        "Water count"
-                                        "Actual"
-                                        (map :water-count e-vs-a)
-                                        (map :actual e-vs-a))
-                         (g/point-chart (str "Expected Error (n=" n ")")
-                                        "Water count"
-                                        "Expected"
-                                        (map :water-count e-vs-a)
-                                        (map :expected e-vs-a)
-                                        "red")]))
+                        [{:layer [(g/point-chart (str "Expected Error (n=" n ")")
+                                                 "Water count"
+                                                 "Expected"
+                                                 (map :water-count e-vs-a)
+                                                 (map :expected e-vs-a)
+                                                 "red")
+                                  (g/line-chart (str "Mean")
+                                                "Water count"
+                                                "Mean"
+                                                [0 (apply max (map :water-count e-vs-a))]
+                                                (repeat (stats/mean (map :expected e-vs-a))))]}
+                         {:layer [(g/point-chart (str "Actual Error (n=" n ")")
+                                                 "Water count"
+                                                 "Actual"
+                                                 (map :water-count e-vs-a)
+                                                 (map :actual e-vs-a)
+                                                 "black")
+                                  (g/line-chart (str "Mean")
+                                                "Water count"
+                                                "Mean"
+                                                [0 (apply max (map :water-count e-vs-a))]
+                                                (repeat (stats/mean (map :actual e-vs-a))))]}
+                         {:layer
+                          [(g/point-chart (str "Expected - Actual Error (n=" n ")")
+                                          "Water count"
+                                          "Expected - Actual Error"
+                                          (map :water-count e-vs-a)
+                                          (map :expected-minus-actual e-vs-a)
+                                          "purple")
+                           (g/line-chart (str "Mean")
+                                         "Water count"
+                                         "Mean"
+                                         [0 (apply max (map :water-count e-vs-a))]
+                                         (repeat (stats/mean (map :expected-minus-actual e-vs-a))))]}]))
                        expected-vs-actuals)})
 
 
