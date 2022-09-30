@@ -50,8 +50,8 @@
 (def samples-density (frequencies (map #(* (m/floor(/ % grid-step)) grid-step) samples)))
 
 (clerk/vl
- {:hconcat [(g/point-chart "Samples" "Sample number" "proportion water (p)" (range) samples "blue" 1)
-            (g/point-chart "Density" "proportion water (p)" "Density" (keys samples-density)
+ {:hconcat [(g/point-chart "Posterior Samples" "Sample number" "proportion water (p)" (range) samples "blue" 1)
+            (g/point-chart "Posterior Sample Density" "proportion water (p)" "Posterior Sample Density" (keys samples-density)
                           (d/standardize(vals samples-density)) "blue" 5)]})
 
 ;; ## Different ways of choosing d and calculating expected error
@@ -159,7 +159,7 @@
                                                  (map :water-count e-vs-a)
                                                  (map :actual e-vs-a)
                                                  "black")
-                                  (g/line-chart (str "Mean")
+                                  (g/line-chart "Mean"
                                                 "Water count"
                                                 "Mean"
                                                 [0 (apply max (map :water-count e-vs-a))]
@@ -171,7 +171,7 @@
                                           (map :water-count e-vs-a)
                                           (map :expected-minus-actual e-vs-a)
                                           "purple")
-                           (g/line-chart (str "Mean")
+                           (g/line-chart "Mean"
                                          "Water count"
                                          "Mean"
                                          [0 (apply max (map :water-count e-vs-a))]
