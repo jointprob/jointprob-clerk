@@ -109,9 +109,9 @@
 
 (error-from-samples samples d-from-posterior)
 
-;; ## Let's calculate the expected error vs the actual error 1000 times and plot them.
+;; ## Let's calculate the expected error vs the actual error 1,000 times and plot them.
 
-; For 10, 100 and 1000 evidence samples and for random values of p (the proportion of water on the globe) which is the unobserved variable.
+; For 10, 100 and 1,000 evidence samples and for random values of p (the proportion of water on the globe) which is the unobserved variable.
 
 (defn expected-error-from-random-samples-vs-real-loss [n p]
   (let [data (repeatedly n #(r/randval p :W :L))
@@ -135,6 +135,9 @@
 ;; ## Finally let's plot the expected and actual error and the (expected - actual error for each trial)
 
 ;; The blue lines on these graphs are the means for 1,000 trials.
+
+;; The unobserved parameter of this model that we are trying to infer is p = 0.6.
+;; The evidence is our n :W or :L samples.
 
 (clerk/vl {:hconcat (map
                      (fn [[n e-vs-a]]
@@ -176,12 +179,12 @@
                        expected-vs-actuals)})
 
 
-;; ### Mean expected and actual loss over 1000 trials and mean of the difference
+;; ### Mean expected and actual loss over 1,000 trials and mean of the difference
 
 ;; Here are the mean values of :expected and :actual error for different amounts of evidence (:n).
 
 ;; And would you break even on average if you bet that the actual error was less than expected error?
-;; What is the average of :expected - :actual across the 1000 trials?
+;; What is the average of each (:expected - :actual) across the 1,000 trials?
 
 (clerk/table (map (fn [[n e-vs-a]] {:n n
                                     :mean-expected-error (stats/mean (map :expected e-vs-a))
