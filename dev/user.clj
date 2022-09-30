@@ -1,9 +1,11 @@
-(require '[nextjournal.clerk :as clerk])
+;(require '[nextjournal.clerk :as clerk])
 
 ;; start Clerk's built-in webserver on the default port 7777, opening the browser when done
-(clerk/serve! {:watch-paths ["notebooks" "src"]})
+;(clerk/serve! {:watch-paths ["notebooks" "src"]})
+
 
 (comment
+  (require '[nextjournal.clerk :as clerk])
   ;; to require tests:
   (require '[dbinomial-test])
   (clerk/serve! {:watch-paths ["notebooks" "src"]})
@@ -27,6 +29,8 @@
   (clerk/show! "notebooks/notes_further_to_stat_rethink.clj")
   (clerk/show! "notebooks/making_the_model_go.clj")
   (clerk/show! "notebooks/ch3_code_snippets.clj")
+  (clerk/show! "notebooks/expected_loss.clj")
+
 
   (clerk/show! "index.md")
 
