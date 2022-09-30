@@ -4,7 +4,8 @@
             [graphs :as g]
             [fastmath.protocols]
             [fastmath.stats :as stats]
-            [fastmath.random :as r]))
+            [fastmath.random :as r]
+            [dbinomial :as d]))
 
 
 ; # Calculating expected loss / error in Clojure using [fastmath](https://github.com/generateme/fastmath) library
@@ -27,6 +28,9 @@
 
 (def p-grid (m/slice-range 0.0 1.0 201))
 
+;; The step between grid bins (need to decrement count as this is an inclusive scale between 0 and 1).
+(def grid-step (/ 1 (dec (count p-grid))))
+
 ;; ### First let's create a posterior distribution having seen 6 water samples in 9 random samples.
 
 (def prob-data (map #(r/pdf (r/distribution :binomial {:trials 9 :p %}) 6) p-grid))
@@ -43,12 +47,12 @@
 
 (def samples (r/->seq posterior-distr 10000))
 
-(def samples-density (k/kernel-density :epanechnikov samples))
+(def samples-density (frequencies (map #(* (m/floor(/ % grid-step)) grid-step) samples)))
 
 (clerk/vl
- {:hconcat [(g/point-chart "Samples" "Sample number" "proportion water (p)" (range) samples)
-            (g/line-chart "Density" "proportion water (p)" "Density" p-grid
-                          (map samples-density p-grid))]})
+ {:hconcat [(g/point-chart "Samples" "Sample number" "proportion water (p)" (range) samples "blue" 1)
+            (g/point-chart "Density" "proportion water (p)" "Density" (keys samples-density)
+                          (d/standardize(vals samples-density)) "blue" 5)]})
 
 ;; ## Different ways of choosing d and calculating expected error
 
@@ -139,18 +143,19 @@
 
 (clerk/vl {:hconcat (map
                      (fn [[n e-vs-a]]
-                       {:layer
-                        [(g/point-chart (str "Expected vs Actual Error (n=" n ")")
-                                      "Water count"
-                                      "Actual"
-                                      (map :water-count e-vs-a)
-                                      (map :actual e-vs-a))
-                         (g/point-chart (str "Expected vs Actual Error (n=" n ")")
+                       (hash-map :vconcat
+                        [(g/point-chart (str "Actual Error (n=" n ")")
+                                        "Water count"
+                                        "Actual"
+                                        (map :water-count e-vs-a)
+                                        (map :actual e-vs-a))
+                         (g/point-chart (str "Expected Error (n=" n ")")
                                         "Water count"
                                         "Expected"
-                                        (map :water-counte e-vs-a)
-                                        (map :expected e-vs-a))]})
-                     expected-vs-actuals)})
+                                        (map :water-count e-vs-a)
+                                        (map :expected e-vs-a)
+                                        "red")]))
+                       expected-vs-actuals)})
 
 
 ;; ### Mean expected and actual loss over 1000 trials and mean of the difference

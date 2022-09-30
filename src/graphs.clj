@@ -28,12 +28,19 @@
    :encoding {:x {:field "x" :type "quantitative" :title x-title}
               :y {:field "y" :type "quantitative" :title y-title}}})
 
-(defn point-chart [title x-title y-title x-values y-values]
+(defn point-chart
+  ([title x-title y-title x-values y-values color point-size]
   {:title title
    :data {:values (build-data x-values y-values)}
-   :mark {:type :point :opacity 0.5}
+   :mark {:type :point :opacity 0.5 :color color :size point-size :filled true}
    :encoding {:x {:field "x" :type "quantitative" :title x-title}
               :y {:field "y" :type "quantitative" :title y-title}}})
+  ([title x-title y-title x-values y-values]
+   (point-chart title x-title y-title x-values y-values "blue" 20))
+  ([title x-title y-title x-values y-values color]
+   (point-chart title x-title y-title x-values y-values color 20)))
+
+
 
 (defn distribution-with-area
   [title x-title y-title x-values y-values transform]
