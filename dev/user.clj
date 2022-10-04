@@ -30,6 +30,7 @@
   (clerk/show! "notebooks/making_the_model_go.clj")
   (clerk/show! "notebooks/ch3_code_snippets.clj")
   (clerk/show! "notebooks/expected_loss.clj")
+  (clerk/show! "notebooks/howell1.clj")
 
 
   (clerk/show! "index.md")

@@ -1,8 +1,11 @@
 {:deps    {io.github.nextjournal/clerk           {:mvn/version "0.9.513"}
            io.github.nextjournal/clerk-slideshow {:git/sha "82b3b83ca456995250bdb99deceb5a24fdd75439"}
            generateme/fastmath {:mvn/version "2.1.9-SNAPSHOT"
-                                :exclusions [com.github.haifengl/smile-mkl]}}
- :paths   ["src" "notebooks"]
+                                :exclusions [com.github.haifengl/smile-mkl]}
+           org.clojure/data.csv {:mvn/version "1.0.1"}
+           kixi/stats {:mvn/version "0.5.5"}
+           }
+ :paths   ["src" "notebooks" "data"]
 
  :aliases {:nextjournal/clerk
            {:exec-fn   nextjournal.clerk/build-static-app!
