@@ -1,6 +1,5 @@
 (ns howell1
   (:require [nextjournal.clerk :as clerk]
-            [graphs :as g]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
             [kixi.stats.math :as km]
@@ -127,7 +126,8 @@
 ;; We'll ignore the uniform prior for sd as it will have no effect on the posterior probability after
 ;; standardisation. Our prior for mu is a normal distribution with mean 178 and standard deviation 20.
 
-(def prior (map (fn [{:keys [mu _]}] (dnorm mu 178.0 20)) grid))
+(def prior (-> (map (fn [{:keys [mu _]}] (dnorm mu 178.0 20)) grid)
+               d/standardize))
 
 (clerk/vl (heat-map-graph "Prior mu = Normal(178,20)"
                           (map #(assoc %1 :ll %2) grid prior)
