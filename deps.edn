@@ -10,7 +10,7 @@
  :aliases {:nextjournal/clerk
            {:exec-fn   nextjournal.clerk/build-static-app!
             :git/url   "https://github.com/jamiepratt/jointprob-clerk"
-            :exec-args {:paths ["notebooks/**"] :bundle? false}}
+            :exec-args {:paths ["notebooks/*"] :bundle? true}}
            :repl-server
            {:exec-fn   clojure.core.server/start-server
             :exec-args {:name          "repl-server"

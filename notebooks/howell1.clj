@@ -101,7 +101,8 @@
   (map #(->> %
              :height
              (relative-likelihood-for-grid grid)
-             d/standardize) adult-heights))
+             d/standardize)
+       adult-heights))
 
 (defn heat-map-graph 
   ([title data z-title]
